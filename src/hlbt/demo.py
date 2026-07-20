@@ -160,6 +160,11 @@ _TEMPLATE = r"""<!doctype html>
   select{background:#0a1310;color:var(--text);border:1px solid var(--line);
     border-radius:8px;padding:8px 10px;font:inherit}
   .mono{font:12px/1.6 ui-monospace,monospace;color:var(--dim)}
+  .legend{display:inline-flex;align-items:center;gap:6px;font-size:11px;
+    color:var(--dim);white-space:nowrap}
+  .legend i{width:8px;height:8px;border-radius:50%;background:var(--d);
+    display:inline-block;margin-left:7px}
+  .legend i:first-child{margin-left:0}
   footer{flex:0 0 auto;padding:0 18px 10px}
   footer a{color:var(--accent)}
   .note{font-size:11.5px;color:var(--dim);line-height:1.6}
@@ -206,6 +211,12 @@ _TEMPLATE = r"""<!doctype html>
       <option value="0">Jump to end</option>
     </select>
     <span class="mono" id="clock">—</span>
+    <span class="legend">
+      <i style="--d:#4db8ff"></i>Long
+      <i style="--d:#ffd23f"></i>Short
+      <i style="--d:#34e29b"></i>Win
+      <i style="--d:#ef4b6b"></i>Loss
+    </span>
   </div>
   <div class="note" id="finalNote"></div>
 </main>
@@ -269,9 +280,19 @@ priceChart.timeScale().subscribeVisibleLogicalRangeChange(r => {
 });
 
 // --- markers, indexed by the bar they belong to -------------------------
+// Direction and outcome get separate palettes so they never read as the same
+// thing: entries are blue (long) / yellow (short), which also keeps them
+// legible against the green and red candles; exits are green (win) / red
+// (loss). A blue arrow is a decision, a green dot is a result.
+const ENTRY_LONG = '#4db8ff';
+const ENTRY_SHORT = '#ffd23f';
+const EXIT_WIN = '#34e29b';
+const EXIT_LOSS = '#ef4b6b';
+
 const markersByBar = new Map();
 for (const t of D.trades) {
   const long = t.side === 'long';
+  const won = t.net_pnl >= 0;
   const push = (bar, m) => {
     if (!markersByBar.has(bar)) markersByBar.set(bar, []);
     markersByBar.get(bar).push(m);
@@ -279,16 +300,16 @@ for (const t of D.trades) {
   push(t.entry_index, {
     time: Math.floor(t.entry_time / 1000),
     position: long ? 'belowBar' : 'aboveBar',
-    color: long ? '#34e29b' : '#ef4b6b',
+    color: long ? ENTRY_LONG : ENTRY_SHORT,
     shape: long ? 'arrowUp' : 'arrowDown',
     text: long ? 'LONG' : 'SHORT',
   });
   push(t.exit_index, {
     time: Math.floor(t.exit_time / 1000),
     position: long ? 'aboveBar' : 'belowBar',
-    color: t.net_pnl >= 0 ? '#7d968e' : '#ef4b6b',
+    color: won ? EXIT_WIN : EXIT_LOSS,
     shape: 'circle',
-    text: `${t.net_pnl >= 0 ? '+' : ''}${fmt(t.net_pnl)}`,
+    text: `${won ? '+' : ''}${fmt(t.net_pnl)}`,
   });
 }
 
