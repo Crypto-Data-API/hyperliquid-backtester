@@ -1,10 +1,40 @@
 # Hyperliquid Backtester
 
-> *Sync real Hyperliquid market data, test a strategy against it with honest costs, then watch the backtest replay bar by bar.*
+> ### Most backtests lie to you.
+> **This one charges the fees, pays the funding, refuses to peek at the future — then replays every trade bar by bar so you can watch exactly where the money went.**
 
-A small, readable backtesting engine for crypto perpetuals. No framework to learn and no config pyramid — one strategy class, one CLI, and a self-contained HTML chart you can scrub through. Two dependencies, ~1,500 lines you can read in an afternoon.
+Backtest crypto perpetual strategies against real Hyperliquid market data, on your machine, in three commands.
+
+Here is the kind of thing it tells you that a normal backtest hides. The mean-reversion example in this repo returns **+1.72%** over 71 days — and to earn that **$172 of profit it paid $605 in fees.** Costs ate **78% of the gross**. Switch fees off, as most backtests quietly do, and the same strategy looks like a runaway winner.
+
+That is the entire design goal: a number you can act on, or a number you can throw away — but never a number that flatters you.
 
 ![The Hyperliquid Backtester replay — candles, equity curve, and bar-by-bar playback](attachments/hyperliquid-backtester-app.png)
+
+## Three things it does that most backtesters don't
+
+**Lookahead is impossible, not merely discouraged.** Your strategy is never handed the full price series. On bar *i* it receives arrays sliced `[:i+1]` — there is no future bar to index into by accident, and no discipline required to avoid it. Orders fill at the **next** bar's open, never at the close that produced the signal. Both properties are locked down by tests.
+
+**Costs are on by default and hurt.** Taker fees on both legs, slippage against you entering *and* exiting, funding charged per bar, and leverage-aware liquidation checked against each bar's adverse extreme. When a single bar spans both your stop and your target, the **stop wins** — because OHLC cannot tell you which came first, and guessing in your own favour is how backtests start lying.
+
+**You can watch it happen.** `hlbt demo` exports a self-contained HTML replay: candles, entry and exit markers, a live equity curve, and a play button. A summary table says *"+1.72%, 67% win rate"* and sounds pleasant. The replay shows you the **24 unbroken days underwater** it took to get there — that strategy sat below its starting equity for **41% of the run**. One of those two views tells you whether you'd have actually held on.
+
+## Two strategies, same market, same 71 days, opposite conclusions
+
+| | `bollinger_revert` | `sma_cross` |
+|---|---|---|
+| Win rate | **67.05%** | 22.09% |
+| Risk:reward | 0.59 | **2.29** |
+| Profit factor | **1.21** | 0.65 |
+| Expectancy / trade | **+$2.70** | −$8.58 |
+| **Return** | **+1.72%** | **−17.57%** |
+
+Pick your strategy on win rate and you take the first. Pick it on risk:reward and you take
+the second — which loses 17.6%. The reversion system wins constantly with *terrible*
+reward-to-risk; the trend system risks well and is simply wrong four times out of five.
+
+No single metric survives that. So `hlbt run` prints profit factor, expectancy, max
+drawdown and fees beside win rate every time, and the run index sorts on any of them.
 
 ## Quickstart
 
@@ -43,21 +73,13 @@ for the replay. Press **Play**.
 | `docs/` | [Data sync](docs/DATA-SYNC.md) · [Writing strategies](docs/WRITING-STRATEGIES.md) · [Validation](docs/VALIDATION.md) |
 | `tests/` | 16 tests covering the engine invariants — lookahead, fill timing, cost accounting, liquidation |
 
-## Why the defaults are unflattering
-
-Most backtests mislead in the same three ways, so this engine is opinionated about all three.
-
-**Fees and slippage are charged by default** — both legs, taker rate, slippage against you on entry *and* exit. In the example run below, fees came to **$605 against $172 of net profit**. A zero-fee backtest would have shown that strategy as a clear winner.
-
-**Funding is charged by default.** Perpetuals pay or receive funding continuously; any strategy holding more than a bar or two is materially affected, and a backtest that ignores it is not modelling a perp.
-
-**Lookahead is structurally impossible.** A strategy never receives the full price series — on bar *i* it gets arrays sliced `[:i+1]`, so there is no future bar to index into by accident. Orders fill at the **next** bar's open, never at the close that produced the signal.
-
 ## The replay
 
-`hlbt demo` writes one self-contained HTML file. A summary table tells you a strategy made 1.7% with a 67% win rate; the replay tells you it spent five weeks underwater first. Only one of those is visible in a table, and only one of them tells you whether you could have held it.
+**Space** play/pause · **←/→** step one bar · scrub · 1× to 64× · jump to end. Entries are
+blue for long and yellow for short; exits are green for a win and red for a loss.
 
-**Space** play/pause · **←/→** step one bar · scrub · 1× to 64× · jump to end. The chart fills the window, and the logo returns to the run index.
+The run index sorts on any column, filters by strategy, and draws an equity sparkline per
+run — so a losing streak is visible before you open anything.
 
 ## Data layer: CryptoDataAPI
 
@@ -146,32 +168,15 @@ Everything in **`strategies/user/` is gitignored**. Strategies you write — or 
 AI agent writes for you — never land in a commit or a public fork unless you
 explicitly `git add -f` them.
 
-## Included examples
+## Before you believe any of it
 
-Run both over the same window and the contrast is the point:
+Two example strategies ship with the repo — `bollinger_revert` (mean reversion) and
+`sma_cross` (trend following). They fail in opposite regimes, so running both tells you
+more about the *window* than either tells you about itself. Neither is a prediction:
+change the dates and the winner can invert.
 
-```
-bollinger_revert  BTC 15m        sma_cross  BTC 15m
-  Trades          173              Trades          172
-  Win rate        67.05%           Win rate        22.09%
-  Profit factor   1.2055           Profit factor   0.65
-  Total return    1.7168%          Total return    -17.5683%
-  Max drawdown    -4.889%          Max drawdown    -20.097%
-  Fees paid       605.38           Fees paid       542.85
-```
-
-Same symbol, same 71 days, opposite outcomes. Mean reversion and trend following fail
-in opposite regimes, so running both tells you more about the window than either does
-alone. Neither is a prediction — change the window and they can invert.
-
-## Reading the numbers honestly
-
-A **67% win rate** with a **profit factor of 1.21** means the losers are nearly as big
-as the winners. Win rate alone is close to meaningless — a strategy can win 80% of its
-trades and still lose money. `hlbt run` always prints profit factor, expectancy, max
-drawdown and fees beside it for that reason.
-
-Before believing any backtest, read [docs/VALIDATION.md](docs/VALIDATION.md): the
+That caveat is the point. Read [docs/VALIDATION.md](docs/VALIDATION.md) before trusting
+any result you get here — it covers the
 multiple-comparisons problem, why testing many variants makes a good-looking result
 *more* likely to be noise, and what this engine still does not model — order-book
 depth, partial fills, market impact.
