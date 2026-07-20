@@ -2,7 +2,7 @@
 
 > *Backtest crypto perpetual strategies against real Hyperliquid market data, on your machine, in three commands.*
 
-Here is the kind of thing it tells you that a normal backtest hides. The mean-reversion example in this repo returns **+1.72%** over 71 days — and to earn that **$172 of profit it paid $605 in fees.** Costs ate **78% of the gross**. Switch fees off, as most backtests quietly do, and the same strategy looks like a runaway winner.
+Here is the kind of thing it tells you that a normal backtest hides. The `bollinger_revert` example returns **+1.64%** over 71 days — and to earn that **$164 of profit it paid $605 in fees.** Costs ate **79% of the gross**. Switch fees off, as most backtests quietly do, and the same strategy looks like a runaway winner.
 
 That is the entire design goal: a number you can act on, or a number you can throw away — but never a number that flatters you.
 
@@ -16,24 +16,29 @@ That is the entire design goal: a number you can act on, or a number you can thr
 
 **Costs are on by default and hurt.** Taker fees on both legs, slippage against you entering *and* exiting, funding charged per bar, and leverage-aware liquidation checked against each bar's adverse extreme. When a single bar spans both your stop and your target, the **stop wins** — because OHLC cannot tell you which came first, and guessing in your own favour is how backtests start lying.
 
-**You can watch it happen.** `hlbt demo` exports a self-contained HTML replay: candles, entry and exit markers, a live equity curve, and a play button. A summary table says *"+1.72%, 67% win rate"* and sounds pleasant. The replay shows you the **24 unbroken days underwater** it took to get there — that strategy sat below its starting equity for **41% of the run**. One of those two views tells you whether you'd have actually held on.
+**You can watch it happen.** `hlbt demo` exports a self-contained HTML replay: candles, entry and exit markers, a live equity curve, and a play button. A summary table says *"+1.64%, 64% win rate"* and sounds pleasant. The replay shows you the **24 unbroken days underwater** it took to get there — that strategy sat below its starting equity for **41% of the run**. One of those two views tells you whether you'd have actually held on.
 
-## Two strategies, same market, same 71 days, opposite conclusions
+## Three strategies, same market, same 71 days
 
-| | `bollinger_revert` | `sma_cross` |
-|---|---|---|
-| Win rate | **67.05%** | 22.09% |
-| Risk:reward | 0.59 | **2.29** |
-| Profit factor | **1.21** | 0.65 |
-| Expectancy / trade | **+$2.70** | −$8.58 |
-| **Return** | **+1.72%** | **−17.57%** |
+| | `rsi_reversion` | `bollinger_revert` | `sma_cross` |
+|---|---|---|---|
+| Win rate | 62.5% | **64.2%** | 22.1% |
+| Risk:reward | 0.73 | 0.60 | **2.14** |
+| Profit factor | **1.22** | 1.07 | 0.61 |
+| Expectancy / trade | **+$2.90** | +$0.95 | −$10.15 |
+| **Return** | **+2.09%** | **+1.64%** | **−17.45%** |
 
-Pick your strategy on win rate and you take the first. Pick it on risk:reward and you take
-the second — which loses 17.6%. The reversion system wins constantly with *terrible*
+Pick on win rate and you take a reversion strategy. Pick on risk:reward and you take
+`sma_cross` — which loses 17.5%. The reversion systems win constantly with *terrible*
 reward-to-risk; the trend system risks well and is simply wrong four times out of five.
 
-No single metric survives that. So `hlbt run` prints profit factor, expectancy, max
-drawdown and fees beside win rate every time, and the run index sorts on any of them.
+No single metric survives that, so `hlbt run` prints profit factor, expectancy, max
+drawdown and fees beside win rate every time.
+
+`sma_cross` stays red on purpose. Tuning it over **900 configurations** produced
+**+13.64%** on the first 70% of the window — and **−3.43%** on the 30% the search had
+never seen. Not one of the top eight survived. That gap is what
+[docs/VALIDATION.md](docs/VALIDATION.md) is about, measured here rather than asserted.
 
 ## Quickstart
 
@@ -67,10 +72,10 @@ for the replay. Press **Play**.
 | `src/hlbt/indicators.py` | `sma`, `ema`, `wma`, `hma`, `alma`, `rsi`, `atr`, `stddev`, `bollinger` — vectorised, `nan` through warm-up rather than back-filled |
 | `src/hlbt/demo.py` | The replay export: candles, entry/exit markers, equity curve, play/pause/scrub — plus the run index |
 | `src/hlbt/metrics.py` | Profit factor, expectancy, Sharpe, max drawdown, fees, funding, liquidations |
-| `strategies/examples/` | `bollinger_revert.py` (mean reversion) and `sma_cross.py` (trend following) — reference implementations |
+| `strategies/examples/` | `rsi_reversion.py` and `bollinger_revert.py` (mean reversion) plus `sma_cross.py` (trend following, a documented overfitting control) |
 | `strategies/user/` | **Gitignored.** Where your own and AI-generated strategies live |
 | `docs/` | [Data sync](docs/DATA-SYNC.md) · [Writing strategies](docs/WRITING-STRATEGIES.md) · [Validation](docs/VALIDATION.md) |
-| `tests/` | 16 tests covering the engine invariants — lookahead, fill timing, cost accounting, liquidation |
+| `tests/` | 17 tests covering the engine invariants — lookahead, fill timing, cost accounting, P&L reconciliation, liquidation |
 
 ## The replay
 
@@ -172,10 +177,14 @@ explicitly `git add -f` them.
 
 ## Before you believe any of it
 
-Two example strategies ship with the repo — `bollinger_revert` (mean reversion) and
-`sma_cross` (trend following). They fail in opposite regimes, so running both tells you
-more about the *window* than either tells you about itself. Neither is a prediction:
-change the dates and the winner can invert.
+Three example strategies ship with the repo. They fail in opposite regimes, so running
+all three tells you more about the *window* than any tells you about itself. None is a
+prediction: change the dates and the winner can invert.
+
+`rsi_reversion`'s defaults are **tuned** — around 640 configurations, ranked on 70% of
+the window and checked once on the held-out 30%, where it produced 20 trades and +0.07%.
+Positive, but on 20 trades that is a coin flip's distance from zero. Its docstring says
+so, and so should any result you generate here.
 
 That caveat is the point. Read [docs/VALIDATION.md](docs/VALIDATION.md) before trusting
 any result you get here — it covers the

@@ -761,7 +761,7 @@ const store = {
 const S = {
   filter: '',
   winnersOnly: store.get('winnersOnly', '0') === '1',
-  sortKey: store.get('sortKey', 'return_pct'),
+  sortKey: store.get('sortKey', 'expectancy'),   // best expectancy first by default
   sortDir: Number(store.get('sortDir', -1)),
   tab: store.get('tab', 'prompts'),
   open: store.get('panelOpen', '1') === '1',

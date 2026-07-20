@@ -8,6 +8,26 @@ It is also a useful control. Mean-reversion and trend-following fail in
 opposite regimes, so running both over the same window tells you more about
 the window than either does alone.
 
+It loses money here — deliberately left that way
+------------------------------------------------
+On the 71-day BTC 15m window in this repo it returns about -17%, and the
+temptation is to tune until it doesn't. We tried, and the result is worth more
+than a green number would have been.
+
+**900 configurations** were searched over fast/slow lengths, stops, targets and
+long-only. Ranked on the first 70% of the window, the best config returned
+**+13.64%** with an expectancy of +$50 per trade. It looked like the strongest
+strategy in the repo.
+
+Run once on the remaining 30% that the search had never seen, that same config
+returned **-3.43%**. **None of the top eight survived**, and all of them clustered
+on the same fast=40/slow=120 island — one stretch of price, fitted.
+
+That gap between +13.64% and -3.43% is the entire content of
+``docs/VALIDATION.md``, produced by this engine on this data. Ship the tuned
+version and it would have been the best-looking row on the dashboard and
+completely fake. So the defaults here are untuned, and the strategy stays red.
+
 Reference implementation, not a recommendation.
 """
 

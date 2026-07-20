@@ -11,10 +11,27 @@ dislocation, and a much shorter RSI so only genuine extremes qualify. Running
 both over the same window shows you what those guards are worth — which is a
 more useful thing to learn than either result on its own.
 
-The naive version's weakness is structural, not a matter of tuning: RSI can sit
-pinned below 30 for the entire duration of a trend while price keeps falling.
-"Oversold" is not the same as "about to bounce", and nothing in this strategy
-knows the difference.
+The structural weakness survives any tuning: RSI can sit pinned below 30 for the
+entire duration of a trend while price keeps falling. "Oversold" is not the same
+as "about to bounce", and nothing in this strategy knows the difference.
+
+How these parameters were chosen — read this before trusting the numbers
+----------------------------------------------------------------------
+They are **tuned**, and the honest accounting is:
+
+* ~640 configurations were tried, ranked on the first 70% of a 71-day BTC 15m
+  window (4,817 bars).
+* The top candidates were then run once on the remaining 30% (2,065 bars) that
+  the search had never seen. Four stayed positive; this is one of them.
+* Out-of-sample that config produced **20 trades and +0.07%**. Positive, but on
+  20 trades that is a coin flip's distance from zero. Treat it as "not obviously
+  broken", not as evidence of an edge.
+
+Over the full window it returns ~+2.1% with a 62% win rate. That number benefits
+from hindsight — the window was chosen after the fact, and 640 trials is enough
+that the best of them looks good whether or not anything real is there. See
+``docs/VALIDATION.md``, and compare with ``sma_cross``, where the same procedure
+turned +13.6% in-sample into -3.4% out of sample.
 
 Reference implementation. Not a recommendation.
 """
@@ -31,14 +48,16 @@ class RsiReversion(Strategy):
     name = "rsi_reversion (example)"
     warmup = 60
 
-    rsi_period = 14
-    oversold = 30.0
-    overbought = 70.0
+    # These defaults are TUNED, not textbook — see the note at the bottom of
+    # this docstring block. The classic settings are period 14 with 30/70.
+    rsi_period = 9
+    oversold = 15.0
+    overbought = 75.0
     exit_level = 50.0        # reversion target: RSI back to the middle
 
-    hard_stop_pct = 0.05
+    hard_stop_pct = 0.06
     hard_take_pct = 0.10
-    time_stop_bars = 192     # two days on 15m — cut a thesis that never played out
+    time_stop_bars = 144     # 36h on 15m — cut a thesis that never played out
     allow_short = True
 
     position_size_pct = 0.5
