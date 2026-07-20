@@ -740,6 +740,10 @@ const ROWS = __ROWS__;
 const $ = id => document.getElementById(id);
 const fmt = (n, d = 2) => Number(n).toLocaleString(undefined, {minimumFractionDigits: d, maximumFractionDigits: d});
 const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+// Green above `good`, red below `bad`, neutral between — a column only shouts
+// when the number is genuinely good or genuinely bad, so the in-between values
+// stay quiet instead of being forced into a binary verdict.
+const tone = (v, good, bad) => (v > good ? 'pos' : (v < bad ? 'neg' : ''));
 
 const ICON = {
   prompts: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:100%;height:100%"><polyline points="4 7 9 12 4 17"></polyline><line x1="12" y1="17" x2="20" y2="17"></line></svg>',
@@ -836,13 +840,13 @@ function renderTable() {
       + '<td class="l"><span class="chip">' + esc(r.symbol) + '</span></td>'
       + '<td class="l dim">' + esc(r.timeframe) + '</td>'
       + '<td class="r">' + r.trades + '</td>'
-      + '<td class="r">' + fmt(r.win_rate, 1) + '%</td>'
-      + '<td class="r">' + fmt(r.profit_factor) + '</td>'
-      + '<td class="r">' + fmt(r.risk_reward) + '</td>'
+      + '<td class="r ' + tone(r.win_rate, 50, 35) + '">' + fmt(r.win_rate, 1) + '%</td>'
+      + '<td class="r ' + tone(r.profit_factor, 1, 1) + '">' + fmt(r.profit_factor) + '</td>'
+      + '<td class="r ' + tone(r.risk_reward, 1.5, 1) + '">' + fmt(r.risk_reward) + '</td>'
       + '<td class="r ' + (r.expectancy >= 0 ? 'pos' : 'neg') + '">' + exp + '</td>'
       + '<td class="r ' + (r.return_pct >= 0 ? 'pos' : 'neg') + '">' + (r.return_pct >= 0 ? '+' : '') + fmt(r.return_pct) + '%</td>'
-      + '<td class="r neg">' + fmt(r.max_dd) + '%</td>'
-      + '<td class="r" style="color:' + (r.sharpe >= 0 ? '#c9d4d1' : '#f04b5c') + '">' + fmt(r.sharpe) + '</td>'
+      + '<td class="r ' + (r.max_dd < -10 ? 'neg' : '') + '">' + fmt(r.max_dd) + '%</td>'
+      + '<td class="r ' + tone(r.sharpe, 1, 0) + '">' + fmt(r.sharpe) + '</td>'
       + '<td class="r dim">$' + fmt(r.fees) + '</td>'
       + '<td class="c">' + spark(r.spark, r.return_pct >= 0) + '</td>'
       + '<td class="r">' + replay + '</td></tr>';
