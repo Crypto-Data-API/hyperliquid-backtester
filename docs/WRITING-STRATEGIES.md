@@ -1,7 +1,11 @@
 # Writing a strategy
 
-A strategy is one class with two methods. Put it anywhere; `strategies/user/`
-is gitignored so yours stays private.
+A strategy is one class with two methods.
+
+**Write it to `strategies/user/`.** That directory is gitignored, so anything
+you or an AI agent puts there stays private and cannot land in a commit or a
+public fork. `strategies/examples/` is *tracked* — it ships with the repo — so
+do not put your own work there.
 
 ```python
 from hlbt.indicators import atr, rsi, sma
