@@ -573,10 +573,17 @@ _INDEX_TEMPLATE = r"""<!doctype html>
   .panel{border:1px solid var(--line);border-radius:12px;background:#0a120f;
     overflow:hidden}
   .panelbar{display:flex;align-items:center;gap:11px;flex-wrap:wrap;
-    padding:7px 13px;min-height:0}
-  .panelbar h2.section{margin:0;font-size:13.5px;line-height:1.3}
+    padding:5px 13px;min-height:0}
+  .tabs{display:flex;gap:2px}
+  .tab{background:transparent;border:0;cursor:pointer;color:var(--dim);
+    font:700 11px/1 ui-sans-serif,system-ui;letter-spacing:.09em;
+    text-transform:uppercase;padding:9px 12px;border-radius:0;
+    border-bottom:2px solid transparent;transition:color .12s}
+  .tab:hover{color:var(--text)}
+  .tab[aria-selected="true"]{color:var(--accent);border-bottom-color:var(--accent)}
   .panelsub{flex:1;min-width:180px;font-size:11.5px;color:var(--dim);
     line-height:1.3}
+  .pane[hidden]{display:none}
   .mini{background:transparent;color:var(--dim);border:1px solid var(--line);
     border-radius:6px;padding:4px 11px;font:600 11px/1.3 inherit;cursor:pointer;
     white-space:nowrap}
@@ -607,21 +614,20 @@ _INDEX_TEMPLATE = r"""<!doctype html>
   .copy.done{background:transparent;color:var(--c);
     box-shadow:inset 0 0 0 1px var(--c)}
   /* --- useful links ------------------------------------------------- */
-  .linkrow{display:flex;flex-wrap:wrap;gap:11px;margin-top:13px}
-  .btn{--c:var(--accent);display:inline-flex;align-items:baseline;gap:8px;
-    padding:12px 19px;border-radius:9px;text-decoration:none;cursor:pointer;
-    background:var(--c);color:#04120c;border:0;
-    box-shadow:0 2px 0 rgba(0,0,0,.35);
-    transition:filter .12s, transform .12s, box-shadow .12s}
-  .btn:hover{filter:brightness(1.09);transform:translateY(-1px);
-    box-shadow:0 3px 0 rgba(0,0,0,.35)}
-  .btn:active{transform:translateY(1px);box-shadow:0 1px 0 rgba(0,0,0,.35)}
-  .btn b{font:700 13px/1 ui-sans-serif,system-ui}
-  .btn span{font:600 11.5px/1;opacity:.72}
+  /* Quiet by design. The copy buttons above are the primary action, so these
+     stay as text links — six filled buttons made the secondary thing louder
+     than the primary one. */
+  .linkrow{display:flex;flex-wrap:wrap;gap:6px 26px;margin-top:10px}
+  .btn{display:inline-flex;align-items:baseline;gap:7px;text-decoration:none;
+    color:var(--text);font-size:12.5px}
+  .btn b{font-weight:600;border-bottom:1px solid var(--line);
+    padding-bottom:1px;transition:color .12s, border-color .12s}
+  .btn:hover b{color:var(--accent);border-bottom-color:var(--accent)}
+  .btn span{color:var(--dim);font-size:11.5px}
   /* new-window marker, driven off the attribute so it can never drift out of
      sync with which links actually open a tab */
-  .btn[target="_blank"]::after{content:"↗";font-size:12px;opacity:.6;
-    margin-left:-2px;align-self:center}
+  .btn[target="_blank"]::after{content:"↗";font-size:10.5px;color:var(--dim);
+    margin-left:-3px}
   footer{flex:0 0 auto;padding:16px 18px 24px;color:var(--dim);font-size:11.5px;
     line-height:1.7}
   footer a{color:var(--accent)}
@@ -642,14 +648,19 @@ _INDEX_TEMPLATE = r"""<!doctype html>
 
   <section class="next panel" id="nextPanel">
     <div class="panelbar">
-      <h2 class="section">What next</h2>
-      <span class="panelsub">Copy a prompt into Claude Code, Cursor, or any AI
-        agent with a terminal.</span>
+      <nav class="tabs" role="tablist" aria-label="What next">
+        <button class="tab" role="tab" data-pane="prompts"
+                aria-controls="pane-prompts" aria-selected="true">Prompts</button>
+        <button class="tab" role="tab" data-pane="links"
+                aria-controls="pane-links" aria-selected="false">Links</button>
+      </nav>
+      <span class="panelsub" id="paneHint"></span>
       <button class="mini" id="nextToggle" aria-controls="nextBody"
               aria-expanded="true">Minimise</button>
     </div>
     <div class="panelbody" id="nextBody">
 
+    <div class="pane" id="pane-prompts" role="tabpanel">
   <div class="cards">
 
     <div class="card" style="--c:#34e29b">
@@ -753,28 +764,31 @@ Do not tell me whether to take a trade. I want the mechanics and the risks.</pre
     </div>
 
   </div>
+    </div>
 
-  <h2 class="section">Useful links</h2>
+    <div class="pane" id="pane-links" role="tabpanel" hidden>
   <div class="linkrow">
-    <a class="btn" style="--c:#34e29b" target="_blank" rel="noopener"
+    <a class="btn" target="_blank" rel="noopener"
        href="https://github.com/Crypto-Data-API/algobrain">
       <b>AlgoBrain</b> <span>strategy ideas · free</span></a>
-    <a class="btn" style="--c:#4db8ff" target="_blank" rel="noopener"
+    <a class="btn" target="_blank" rel="noopener"
        href="https://cryptodataapi.com/pricing?code=SOCIAL50">
       <b>Get an API key</b> <span>50% off 3 months</span></a>
-    <a class="btn" style="--c:#4db8ff" target="_blank" rel="noopener"
+    <a class="btn" target="_blank" rel="noopener"
        href="https://cryptodataapi.com/backtest-data">
       <b>Backtest data</b> <span>coverage &amp; docs</span></a>
-    <a class="btn" style="--c:#f5a524" target="_blank" rel="noopener"
+    <a class="btn" target="_blank" rel="noopener"
        href="https://app.hyperliquid.xyz/join/CRYPTODATAAPI">
       <b>Hyperliquid</b> <span>4% off fees · referral</span></a>
-    <a class="btn" style="--c:#f5a524" target="_blank" rel="noopener"
+    <a class="btn" target="_blank" rel="noopener"
        href="https://www.binance.com/register?ref=RZSKG1XM">
       <b>Binance</b> <span>10% off fees · referral</span></a>
-    <a class="btn" style="--c:#7d968e" target="_blank" rel="noopener"
+    <a class="btn" target="_blank" rel="noopener"
        href="https://github.com/Crypto-Data-API/hyperliquid-backtester">
       <b>Source</b> <span>GitHub · MIT</span></a>
   </div>
+    </div>
+
     </div>
   </section>
 </main>
@@ -840,27 +854,51 @@ if (!ROWS.length) {
 // wrapped because it throws in Safari private mode and under some file://
 // origins, and a storage failure must not cost you the toggle itself.
 (() => {
-  const KEY = 'hlbt.next.collapsed';
+  const COLLAPSE_KEY = 'hlbt.next.collapsed';
+  const TAB_KEY = 'hlbt.next.tab';
+  const HINTS = {
+    prompts: 'Copy a prompt into Claude Code, Cursor, or any AI agent with a terminal.',
+    links: 'Market data, strategy ideas, and exchange sign-up.',
+  };
   const panel = document.getElementById('nextPanel');
   const body = document.getElementById('nextBody');
   const btn = document.getElementById('nextToggle');
+  const hint = document.getElementById('paneHint');
+  const tabs = [...document.querySelectorAll('.tab')];
   if (!panel || !body || !btn) return;
 
   const store = {
-    get() { try { return localStorage.getItem(KEY) === '1'; } catch { return false; } },
-    set(v) { try { localStorage.setItem(KEY, v ? '1' : '0'); } catch { /* ignore */ } },
+    get(k, fallback) { try { return localStorage.getItem(k) ?? fallback; } catch { return fallback; } },
+    set(k, v) { try { localStorage.setItem(k, v); } catch { /* ignore */ } },
   };
 
-  function apply(collapsed, persist) {
+  function showTab(name, persist) {
+    if (!HINTS[name]) name = 'prompts';
+    tabs.forEach(t => t.setAttribute('aria-selected', String(t.dataset.pane === name)));
+    for (const key of Object.keys(HINTS)) {
+      const pane = document.getElementById('pane-' + key);
+      if (pane) pane.hidden = key !== name;
+    }
+    hint.textContent = HINTS[name];
+    if (persist) store.set(TAB_KEY, name);
+  }
+
+  function setCollapsed(collapsed, persist) {
     body.hidden = collapsed;
     panel.classList.toggle('collapsed', collapsed);
     btn.textContent = collapsed ? 'Show' : 'Minimise';
     btn.setAttribute('aria-expanded', String(!collapsed));
-    if (persist) store.set(collapsed);
+    if (persist) store.set(COLLAPSE_KEY, collapsed ? '1' : '0');
   }
 
-  apply(store.get(), false);
-  btn.addEventListener('click', () => apply(!body.hidden, true));
+  tabs.forEach(t => t.addEventListener('click', () => {
+    showTab(t.dataset.pane, true);
+    if (body.hidden) setCollapsed(false, true);   // a tab click means "show me"
+  }));
+  btn.addEventListener('click', () => setCollapsed(!body.hidden, true));
+
+  showTab(store.get(TAB_KEY, 'prompts'), false);
+  setCollapsed(store.get(COLLAPSE_KEY, '0') === '1', false);
 })();
 
 // Copy buttons, three ways down. The async clipboard API needs a focused
