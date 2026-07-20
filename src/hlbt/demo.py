@@ -209,21 +209,13 @@ _TEMPLATE = r"""<!doctype html>
 
 <footer>
   <div class="note">
-    Market data: <a href="https://cryptodataapi.com/backtest-data">CryptoDataAPI</a>
-    backtesting archive — Hyperliquid klines and funding. Historical simulations,
-    not predictions, and they exclude order-book depth, partial fills and market
-    impact. Nothing here is financial advice.
-    <br>
-    Strategy ideas: <a href="https://github.com/Crypto-Data-API/algobrain">AlgoBrain</a>
-    — a free knowledge base of crypto trading strategy, with a local MCP server so
-    an AI agent can read it and write new strategies straight into
-    <code>strategies/user/</code>.
-    <br>
-    <strong>Overfitting is real.</strong> The more variants you test, the more
-    likely the best-looking one is noise rather than edge — the winner of a
-    hundred attempts looks good <em>by construction</em>. Count your trials, keep
-    a holdout you have not looked at, and be suspicious of a result that only
-    works at one exact parameter value.
+    Data provided by <a href="https://cryptodataapi.com/backtest-data">CryptoDataAPI</a>
+    · strategy ideas provided by
+    <a href="https://github.com/Crypto-Data-API/algobrain">AlgoBrain</a>
+    · exchange links may contain referrals (at no cost to you — to claim your
+    trading discounts on sign-up) · historical simulations from real data, not
+    predictions · nothing here is financial advice · <strong>overfitting is
+    real</strong> — backtesting trading is not the same as real market trading.
   </div>
 </footer>
 
@@ -569,14 +561,21 @@ _INDEX_TEMPLATE = r"""<!doctype html>
   .copy.done{background:transparent;color:var(--c);
     box-shadow:inset 0 0 0 1px var(--c)}
   /* --- useful links ------------------------------------------------- */
-  .linkrow{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
-  .btn{--c:var(--accent);display:inline-flex;align-items:center;gap:9px;
-    padding:10px 16px;border-radius:9px;text-decoration:none;color:var(--text);
-    background:var(--panel);border:1px solid var(--line);
-    border-left:3px solid var(--c);font-size:12.5px;transition:background .12s}
-  .btn:hover{background:color-mix(in srgb, var(--c) 13%, var(--panel))}
-  .btn b{font-weight:700;color:var(--c)}
-  .btn span{color:var(--dim);font-size:11.5px}
+  .linkrow{display:flex;flex-wrap:wrap;gap:11px;margin-top:13px}
+  .btn{--c:var(--accent);display:inline-flex;align-items:baseline;gap:8px;
+    padding:12px 19px;border-radius:9px;text-decoration:none;cursor:pointer;
+    background:var(--c);color:#04120c;border:0;
+    box-shadow:0 2px 0 rgba(0,0,0,.35);
+    transition:filter .12s, transform .12s, box-shadow .12s}
+  .btn:hover{filter:brightness(1.09);transform:translateY(-1px);
+    box-shadow:0 3px 0 rgba(0,0,0,.35)}
+  .btn:active{transform:translateY(1px);box-shadow:0 1px 0 rgba(0,0,0,.35)}
+  .btn b{font:700 13px/1 ui-sans-serif,system-ui}
+  .btn span{font:600 11.5px/1;opacity:.72}
+  /* new-window marker, driven off the attribute so it can never drift out of
+     sync with which links actually open a tab */
+  .btn[target="_blank"]::after{content:"↗";font-size:12px;opacity:.6;
+    margin-left:-2px;align-self:center}
   footer{flex:0 0 auto;padding:16px 18px 24px;color:var(--dim);font-size:11.5px;
     line-height:1.7}
   footer a{color:var(--accent)}
@@ -728,13 +727,13 @@ Do not tell me whether to take a trade. I want the mechanics and the risks.</pre
 </main>
 
 <footer>
-  Data <a href="https://cryptodataapi.com/backtest-data">CryptoDataAPI</a> ·
-  ideas <a href="https://github.com/Crypto-Data-API/algobrain">AlgoBrain</a> ·
-  exchange links are referrals (commission may be earned at no cost to you, fee
-  discount applied to your account) · historical simulations, not predictions,
-  and nothing here is financial advice · <strong>overfitting is real</strong> —
-  the more variants you test the likelier the best-looking one is noise, so count
-  your trials and read profit factor and max drawdown beside win rate.
+  Data provided by <a href="https://cryptodataapi.com/backtest-data">CryptoDataAPI</a>
+  · strategy ideas provided by
+  <a href="https://github.com/Crypto-Data-API/algobrain">AlgoBrain</a>
+  · exchange links may contain referrals (at no cost to you — to claim your trading
+  discounts on sign-up) · historical simulations from real data, not predictions
+  · nothing here is financial advice · <strong>overfitting is real</strong> —
+  backtesting trading is not the same as real market trading.
 </footer>
 
 <script>
