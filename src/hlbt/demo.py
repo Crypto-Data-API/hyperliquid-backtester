@@ -783,7 +783,7 @@ if (!ROWS.length) {
   host.innerHTML = `<div class="wrap"><table>
     <thead><tr>
       <th>Strategy</th><th>Market</th><th>Trades</th><th>Win rate</th>
-      <th>Profit factor</th><th>Return</th><th>Max DD</th><th>Sharpe</th>
+      <th>Profit factor</th><th>Return</th><th>Max drawdown</th><th>Sharpe</th>
       <th>Fees</th><th></th>
     </tr></thead>
     <tbody>${ROWS.map(r => `
