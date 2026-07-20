@@ -540,6 +540,22 @@ _INDEX_TEMPLATE = r"""<!doctype html>
   .wrap{overflow-x:auto}
   /* --- next-step launcher cards ------------------------------------- */
   h2.section{font-size:15px;margin:30px 0 4px}
+  /* --- collapsible panel -------------------------------------------- */
+  .panel{border:1px solid var(--line);border-radius:12px;background:#0a120f;
+    overflow:hidden}
+  .panelbar{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;
+    padding:13px 16px}
+  .panelbar h2.section{margin:0}
+  .panelsub{flex:1;min-width:180px;font-size:12px;color:var(--dim)}
+  .mini{background:transparent;color:var(--dim);border:1px solid var(--line);
+    border-radius:7px;padding:6px 13px;font:600 11.5px/1 inherit;cursor:pointer;
+    white-space:nowrap}
+  .mini:hover{color:var(--accent);border-color:var(--accent)}
+  .mini::before{content:"▾ ";font-size:10px}
+  .panel.collapsed .mini::before{content:"▸ "}
+  .panelbody{padding:0 16px 16px;border-top:1px solid var(--line);
+    margin-top:2px;padding-top:4px}
+  .panelbody[hidden]{display:none}
   .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(310px,1fr));
     gap:14px;margin-top:14px}
   .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;
@@ -594,9 +610,15 @@ _INDEX_TEMPLATE = r"""<!doctype html>
   <div class="sub">Every result exported to this folder. Click a run to replay it bar by bar.</div>
   <div id="body"></div>
 
-  <section class="next">
-  <h2 class="section">What next</h2>
-  <div class="sub">Copy a prompt into Claude Code, Cursor, or any AI agent with a terminal.</div>
+  <section class="next panel" id="nextPanel">
+    <div class="panelbar">
+      <h2 class="section">What next</h2>
+      <span class="panelsub">Copy a prompt into Claude Code, Cursor, or any AI
+        agent with a terminal.</span>
+      <button class="mini" id="nextToggle" aria-controls="nextBody"
+              aria-expanded="true">Minimise</button>
+    </div>
+    <div class="panelbody" id="nextBody">
 
   <div class="cards">
 
@@ -723,6 +745,7 @@ Do not tell me whether to take a trade. I want the mechanics and the risks.</pre
        href="https://github.com/Crypto-Data-API/hyperliquid-backtester">
       <b>Source</b> <span>GitHub · MIT</span></a>
   </div>
+    </div>
   </section>
 </main>
 
@@ -778,6 +801,33 @@ if (!ROWS.length) {
       </tr>`).join('')}
     </tbody></table></div>`;
 }
+
+// Collapsible "What next" panel. State persists per browser — localStorage is
+// wrapped because it throws in Safari private mode and under some file://
+// origins, and a storage failure must not cost you the toggle itself.
+(() => {
+  const KEY = 'hlbt.next.collapsed';
+  const panel = document.getElementById('nextPanel');
+  const body = document.getElementById('nextBody');
+  const btn = document.getElementById('nextToggle');
+  if (!panel || !body || !btn) return;
+
+  const store = {
+    get() { try { return localStorage.getItem(KEY) === '1'; } catch { return false; } },
+    set(v) { try { localStorage.setItem(KEY, v ? '1' : '0'); } catch { /* ignore */ } },
+  };
+
+  function apply(collapsed, persist) {
+    body.hidden = collapsed;
+    panel.classList.toggle('collapsed', collapsed);
+    btn.textContent = collapsed ? 'Show' : 'Minimise';
+    btn.setAttribute('aria-expanded', String(!collapsed));
+    if (persist) store.set(collapsed);
+  }
+
+  apply(store.get(), false);
+  btn.addEventListener('click', () => apply(!body.hidden, true));
+})();
 
 // Copy buttons, three ways down. The async clipboard API needs a focused
 // document and a secure context, so file:// and unfocused windows fall back to
