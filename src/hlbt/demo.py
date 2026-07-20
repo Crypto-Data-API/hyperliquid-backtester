@@ -120,15 +120,16 @@ _TEMPLATE = r"""<!doctype html>
   body{margin:0;background:var(--bg);color:var(--text);overflow:hidden;
     display:flex;flex-direction:column;
     font:14px/1.5 ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
-  header{flex:0 0 auto;display:flex;align-items:center;gap:16px;flex-wrap:wrap;
-    padding:12px 18px;border-bottom:1px solid var(--line);background:var(--panel)}
-  .brand{font:700 15px/1 ui-monospace,monospace;letter-spacing:.02em;
+  header{flex:0 0 auto;display:flex;align-items:center;gap:20px;flex-wrap:wrap;
+    padding:20px 22px;border-bottom:1px solid var(--line);background:var(--panel);
+    box-shadow:0 1px 0 rgba(52,226,155,.12)}
+  .brand{font:700 22px/1 ui-monospace,monospace;letter-spacing:.02em;
     color:var(--text);text-decoration:none;display:inline-flex;align-items:center;
-    gap:8px;padding:4px 8px;margin:-4px -8px;border-radius:8px}
+    gap:11px;padding:6px 10px;margin:-6px -10px;border-radius:9px}
   .brand:hover{background:rgba(52,226,155,.1)}
   .brand .hl{color:var(--accent)}
-  .brand .mark{color:var(--accent);font-size:17px;letter-spacing:-2px}
-  .tag{font-size:12px;color:var(--dim)}
+  .brand .mark{color:var(--accent);font-size:25px;letter-spacing:-3px}
+  .tag{font-size:13.5px;color:var(--dim)}
   .pill{padding:3px 10px;border:1px solid var(--line);border-radius:99px;
     font:600 11px/1.6 ui-monospace,monospace;color:var(--dim)}
   main{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;
@@ -497,21 +498,29 @@ _INDEX_TEMPLATE = r"""<!doctype html>
     --dim:#7d968e; --green:#34e29b; --red:#ef4b6b; --accent:#34e29b;
   }
   *{box-sizing:border-box}
-  /* the index scrolls — min-height, not height, or the launcher cards clip */
-  html,body{min-height:100%}
-  body{margin:0;background:var(--bg);color:var(--text);display:flex;
-    flex-direction:column;
+  /* The index scrolls, so min-height rather than height — and 100vh rather
+     than 100%, which would resolve against an auto-height html and collapse,
+     leaving the launcher floating mid-page instead of pinned to the bottom. */
+  body{min-height:100vh;margin:0;background:var(--bg);color:var(--text);
+    display:flex;flex-direction:column;
     font:14px/1.5 ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
-  header{flex:0 0 auto;display:flex;align-items:center;gap:16px;flex-wrap:wrap;
-    padding:12px 18px;border-bottom:1px solid var(--line);background:var(--panel)}
-  .brand{font:700 15px/1 ui-monospace,monospace;letter-spacing:.02em;
+  header{flex:0 0 auto;display:flex;align-items:center;gap:20px;flex-wrap:wrap;
+    padding:20px 22px;border-bottom:1px solid var(--line);background:var(--panel);
+    box-shadow:0 1px 0 rgba(52,226,155,.12)}
+  .brand{font:700 22px/1 ui-monospace,monospace;letter-spacing:.02em;
     color:var(--text);text-decoration:none;display:inline-flex;align-items:center;
-    gap:8px;padding:4px 8px;margin:-4px -8px;border-radius:8px}
+    gap:11px;padding:6px 10px;margin:-6px -10px;border-radius:9px}
   .brand:hover{background:rgba(52,226,155,.1)}
   .brand .hl{color:var(--accent)}
-  .brand .mark{color:var(--accent);font-size:17px;letter-spacing:-2px}
-  .tag{font-size:12px;color:var(--dim)}
-  main{flex:1 1 auto;padding:20px 18px;width:100%}
+  .brand .mark{color:var(--accent);font-size:25px;letter-spacing:-3px}
+  .tag{font-size:13.5px;color:var(--dim)}
+  main{flex:1 1 auto;padding:20px 18px;width:100%;
+    display:flex;flex-direction:column}
+  /* the launcher sits at the bottom of the page: the run list absorbs the
+     slack when there are few runs, and everything flows normally when there
+     are many */
+  #body{flex:0 0 auto}
+  .next{margin-top:auto;padding-top:26px}
   h1{font-size:19px;margin:0 0 4px}
   .sub{color:var(--dim);font-size:13px;margin-bottom:18px}
   table{width:100%;border-collapse:collapse;background:var(--panel);
@@ -559,9 +568,15 @@ _INDEX_TEMPLATE = r"""<!doctype html>
   .copy:hover{filter:brightness(1.08)}
   .copy.done{background:transparent;color:var(--c);
     box-shadow:inset 0 0 0 1px var(--c)}
-  .card .foot a{color:var(--dim);font-size:11.5px;text-decoration:none}
-  .card .foot a:hover{color:var(--c)}
-  .refnote{font-size:11px;color:var(--dim);margin-top:9px;line-height:1.6}
+  /* --- useful links ------------------------------------------------- */
+  .linkrow{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+  .btn{--c:var(--accent);display:inline-flex;align-items:center;gap:9px;
+    padding:10px 16px;border-radius:9px;text-decoration:none;color:var(--text);
+    background:var(--panel);border:1px solid var(--line);
+    border-left:3px solid var(--c);font-size:12.5px;transition:background .12s}
+  .btn:hover{background:color-mix(in srgb, var(--c) 13%, var(--panel))}
+  .btn b{font-weight:700;color:var(--c)}
+  .btn span{color:var(--dim);font-size:11.5px}
   footer{flex:0 0 auto;padding:16px 18px 24px;color:var(--dim);font-size:11.5px;
     line-height:1.7}
   footer a{color:var(--accent)}
@@ -580,6 +595,7 @@ _INDEX_TEMPLATE = r"""<!doctype html>
   <div class="sub">Every result exported to this folder. Click a run to replay it bar by bar.</div>
   <div id="body"></div>
 
+  <section class="next">
   <h2 class="section">What next</h2>
   <div class="sub">Copy a prompt into Claude Code, Cursor, or any AI agent with a terminal.</div>
 
@@ -615,7 +631,6 @@ Report profit factor, expectancy, max drawdown and fees alongside win rate — a
 tell me honestly if the trade count is too low to mean anything yet.</pre>
       <div class="foot">
         <button class="copy" data-target="p1">Copy prompt</button>
-        <a href="https://github.com/Crypto-Data-API/algobrain" target="_blank" rel="noopener">Strategy ideas: AlgoBrain →</a>
       </div>
     </div>
 
@@ -648,7 +663,6 @@ Then read docs/DATA-SYNC.md and tell me whether the deep Parquet tiers would giv
 me a longer window for the timeframe I want.</pre>
       <div class="foot">
         <button class="copy" data-target="p2">Copy prompt</button>
-        <a href="https://cryptodataapi.com/backtest-data" target="_blank" rel="noopener">Free API key →</a>
       </div>
     </div>
 
@@ -684,32 +698,43 @@ Live market data for the agent: https://cryptodataapi.com/mcp
 Do not tell me whether to take a trade. I want the mechanics and the risks.</pre>
       <div class="foot">
         <button class="copy" data-target="p3">Copy prompt</button>
-        <a href="https://app.hyperliquid.xyz/join/CRYPTODATAAPI" target="_blank" rel="noopener">Hyperliquid →</a>
-        <a href="https://www.binance.com/register?ref=RZSKG1XM" target="_blank" rel="noopener">Binance →</a>
       </div>
     </div>
 
   </div>
-  <p class="refnote">Exchange links are referral links — a commission may be earned
-    at no cost to you, and the fee discount is applied to your account.</p>
+
+  <h2 class="section">Useful links</h2>
+  <div class="linkrow">
+    <a class="btn" style="--c:#34e29b" target="_blank" rel="noopener"
+       href="https://github.com/Crypto-Data-API/algobrain">
+      <b>AlgoBrain</b> <span>strategy ideas · free</span></a>
+    <a class="btn" style="--c:#4db8ff" target="_blank" rel="noopener"
+       href="https://cryptodataapi.com/pricing?code=SOCIAL50">
+      <b>Get an API key</b> <span>50% off 3 months</span></a>
+    <a class="btn" style="--c:#4db8ff" target="_blank" rel="noopener"
+       href="https://cryptodataapi.com/backtest-data">
+      <b>Backtest data</b> <span>coverage &amp; docs</span></a>
+    <a class="btn" style="--c:#f5a524" target="_blank" rel="noopener"
+       href="https://app.hyperliquid.xyz/join/CRYPTODATAAPI">
+      <b>Hyperliquid</b> <span>4% off fees · referral</span></a>
+    <a class="btn" style="--c:#f5a524" target="_blank" rel="noopener"
+       href="https://www.binance.com/register?ref=RZSKG1XM">
+      <b>Binance</b> <span>up to 20% off fees · referral</span></a>
+    <a class="btn" style="--c:#7d968e" target="_blank" rel="noopener"
+       href="https://github.com/Crypto-Data-API/hyperliquid-backtester">
+      <b>Source</b> <span>GitHub · MIT</span></a>
+  </div>
+  </section>
 </main>
 
 <footer>
-  Market data: <a href="https://cryptodataapi.com/backtest-data">CryptoDataAPI</a>
-  backtesting archive — Hyperliquid klines and funding. Historical simulations,
-  not predictions. Nothing here is financial advice.
-  <br>
-  Strategy ideas: <a href="https://github.com/Crypto-Data-API/algobrain">AlgoBrain</a>
-  — a free knowledge base of crypto trading strategy, with a local MCP server so an
-  AI agent can read it and write new strategies straight into
-  <code>strategies/user/</code>.
-  <br>
-  <strong>Overfitting is real.</strong> The more variants you test, the more likely
-  the best-looking one is noise rather than edge — the winner of a hundred attempts
-  looks good <em>by construction</em>. Count your trials, keep a holdout you have not
-  looked at, and be suspicious of a result that only works at one exact parameter
-  value. Win rate alone is not evidence of an edge either: read profit factor and
-  max drawdown beside it.
+  Data <a href="https://cryptodataapi.com/backtest-data">CryptoDataAPI</a> ·
+  ideas <a href="https://github.com/Crypto-Data-API/algobrain">AlgoBrain</a> ·
+  exchange links are referrals (commission may be earned at no cost to you, fee
+  discount applied to your account) · historical simulations, not predictions,
+  and nothing here is financial advice · <strong>overfitting is real</strong> —
+  the more variants you test the likelier the best-looking one is noise, so count
+  your trials and read profit factor and max drawdown beside win rate.
 </footer>
 
 <script>
