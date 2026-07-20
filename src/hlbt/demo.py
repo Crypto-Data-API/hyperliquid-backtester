@@ -497,7 +497,8 @@ _INDEX_TEMPLATE = r"""<!doctype html>
     --dim:#7d968e; --green:#34e29b; --red:#ef4b6b; --accent:#34e29b;
   }
   *{box-sizing:border-box}
-  html,body{height:100%}
+  /* the index scrolls — min-height, not height, or the launcher cards clip */
+  html,body{min-height:100%}
   body{margin:0;background:var(--bg);color:var(--text);display:flex;
     flex-direction:column;
     font:14px/1.5 ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
@@ -536,6 +537,31 @@ _INDEX_TEMPLATE = r"""<!doctype html>
   code{background:#0a1310;border:1px solid var(--line);border-radius:5px;
     padding:2px 7px;font-size:12px;color:var(--text)}
   .wrap{overflow-x:auto}
+  /* --- next-step launcher cards ------------------------------------- */
+  h2.section{font-size:15px;margin:30px 0 4px}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(310px,1fr));
+    gap:14px;margin-top:14px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;
+    display:flex;flex-direction:column;overflow:hidden}
+  .card header{border-top:3px solid var(--c);background:linear-gradient(
+      to bottom, color-mix(in srgb, var(--c) 12%, transparent), transparent);
+    padding:12px 15px 11px}
+  .card h3{margin:0;font-size:13px;letter-spacing:.05em;text-transform:uppercase;
+    color:var(--c)}
+  .card .why{margin:5px 0 0;font-size:12px;color:var(--dim);line-height:1.55}
+  .card pre{flex:1;margin:0;padding:13px 15px;overflow:auto;max-height:290px;
+    font:11.5px/1.65 ui-monospace,monospace;color:var(--text);white-space:pre-wrap;
+    word-break:break-word;border-top:1px solid var(--line)}
+  .card .foot{display:flex;align-items:center;gap:10px;padding:11px 15px;
+    border-top:1px solid var(--line);background:#0a120f}
+  .copy{background:var(--c);color:#04120c;border:0;border-radius:7px;
+    padding:8px 16px;font:700 12px/1 inherit;cursor:pointer}
+  .copy:hover{filter:brightness(1.08)}
+  .copy.done{background:transparent;color:var(--c);
+    box-shadow:inset 0 0 0 1px var(--c)}
+  .card .foot a{color:var(--dim);font-size:11.5px;text-decoration:none}
+  .card .foot a:hover{color:var(--c)}
+  .refnote{font-size:11px;color:var(--dim);margin-top:9px;line-height:1.6}
   footer{flex:0 0 auto;padding:16px 18px 24px;color:var(--dim);font-size:11.5px;
     line-height:1.7}
   footer a{color:var(--accent)}
@@ -553,6 +579,119 @@ _INDEX_TEMPLATE = r"""<!doctype html>
   <h1>Backtest runs</h1>
   <div class="sub">Every result exported to this folder. Click a run to replay it bar by bar.</div>
   <div id="body"></div>
+
+  <h2 class="section">What next</h2>
+  <div class="sub">Copy a prompt into Claude Code, Cursor, or any AI agent with a terminal.</div>
+
+  <div class="cards">
+
+    <div class="card" style="--c:#34e29b">
+      <header>
+        <h3>Create a new strategy</h3>
+        <p class="why">The agent asks what you want to build — or proposes ideas from
+          different edge families if you have none in mind.</p>
+      </header>
+<pre id="p1">I want to create a new crypto trading strategy for the Hyperliquid Backtester
+(github.com/Crypto-Data-API/hyperliquid-backtester), which is checked out here.
+
+First, ask me what kind of strategy I want. If I don't have one in mind, propose
+three distinct ideas from DIFFERENT edge families — mean reversion, trend, carry,
+liquidation, breakout, market-making — and let me pick. For each, state the
+economic reason the edge should exist in one sentence. If the AlgoBrain MCP server
+is connected (github.com/Crypto-Data-API/algobrain), search it first for the
+relevant family and base the idea on what you find.
+
+Then read docs/WRITING-STRATEGIES.md and write it to strategies/user/NAME.py:
+  - a Strategy subclass returning a Signal from on_bar()
+  - an exit reason from should_exit()
+  - tunable class attributes, not hardcoded numbers
+  - a docstring naming the economic rationale and the expected failure mode
+
+Then run it and show me the result:
+  hlbt run --strategy strategies/user/NAME.py --symbol BTC --timeframe 15m --json-out results/NAME.json
+  hlbt demo results/NAME.json
+
+Report profit factor, expectancy, max drawdown and fees alongside win rate — and
+tell me honestly if the trade count is too low to mean anything yet.</pre>
+      <div class="foot">
+        <button class="copy" data-target="p1">Copy prompt</button>
+        <a href="https://github.com/Crypto-Data-API/algobrain" target="_blank" rel="noopener">Strategy ideas: AlgoBrain →</a>
+      </div>
+    </div>
+
+    <div class="card" style="--c:#4db8ff">
+      <header>
+        <h3>Download backtest data</h3>
+        <p class="why">Connect the CryptoDataAPI MCP server, then sync Hyperliquid
+          klines and funding into this backtester.</p>
+      </header>
+<pre id="p2">Set up market data for the Hyperliquid Backtester in this repo.
+
+1. Add the CryptoDataAPI MCP server. It is keyless — a browser sign-in opens on the
+   first tool call and creates a free account:
+
+     claude mcp add --transport http cryptodataapi https://cryptodataapi.com/mcp
+
+2. Use the MCP tools to tell me which Hyperliquid symbols have the deepest history
+   right now, and what date range each covers.
+
+3. Then sync the data locally. Bulk history needs a Pro Plus key set as
+   CRYPTODATA_API_KEY — tell me if mine is missing or too low a tier:
+
+     hlbt sync --symbol BTC ETH SOL --timeframe 15m --days 90
+
+4. Report the bar count and date range written for each symbol. Flag any symbol
+   that came back with a SHORTER window than I asked for — the query endpoints
+   clamp silently to the earliest available bar rather than erroring.
+
+Then read docs/DATA-SYNC.md and tell me whether the deep Parquet tiers would give
+me a longer window for the timeframe I want.</pre>
+      <div class="foot">
+        <button class="copy" data-target="p2">Copy prompt</button>
+        <a href="https://cryptodataapi.com/backtest-data" target="_blank" rel="noopener">Free API key →</a>
+      </div>
+    </div>
+
+    <div class="card" style="--c:#f5a524">
+      <header>
+        <h3>Trade live on an exchange</h3>
+        <p class="why">Before risking capital: what the backtest does not model, and
+          how to check the strategy survives contact with real fills.</p>
+      </header>
+<pre id="p3">I have a backtested strategy in this repo and I am considering trading it live.
+Be blunt with me rather than encouraging.
+
+1. Read docs/VALIDATION.md, then look at my run in results/ and tell me:
+   - is the trade count large enough to mean anything?
+   - how many variants did I try before this one, and does that change the result?
+   - do fees and funding eat most of the gross profit?
+
+2. Explain what this backtest does NOT model — order-book depth, partial fills,
+   market impact — and how each would change my fills at the size I intend to trade.
+   Re-run with a much higher --slippage and show me whether the edge survives.
+
+3. Then walk me through going live safely: paper trading first, what to compare
+   against the backtest, position sizing, and a portfolio-level kill switch.
+
+Exchange sign-up with fee discounts:
+  Hyperliquid (4% off spot & perp fees):
+    https://app.hyperliquid.xyz/join/CRYPTODATAAPI
+  Binance (up to 20% off trading fees):
+    https://www.binance.com/register?ref=RZSKG1XM
+
+Live market data for the agent: https://cryptodataapi.com/mcp
+
+Do not tell me whether to take a trade. I want the mechanics and the risks.</pre>
+      <div class="foot">
+        <button class="copy" data-target="p3">Copy prompt</button>
+        <a href="https://app.hyperliquid.xyz/join/CRYPTODATAAPI" target="_blank" rel="noopener">Hyperliquid →</a>
+        <a href="https://www.binance.com/register?ref=RZSKG1XM" target="_blank" rel="noopener">Binance →</a>
+      </div>
+    </div>
+
+  </div>
+  <p class="refnote">Exchange links are referral links — a commission may be earned
+    at no cost to you, and the fee discount is applied to your account.</p>
 </main>
 
 <footer>
@@ -615,6 +754,46 @@ if (!ROWS.length) {
       </tr>`).join('')}
     </tbody></table></div>`;
 }
+
+// Copy buttons, three ways down. The async clipboard API needs a focused
+// document and a secure context, so file:// and unfocused windows fall back to
+// execCommand — and if that fails too, the prompt is selected so Ctrl+C works
+// rather than leaving the user with a button that did nothing.
+document.querySelectorAll('.copy').forEach(btn => {
+  const label = btn.textContent;
+  btn.addEventListener('click', async () => {
+    const node = document.getElementById(btn.dataset.target);
+    const text = node.textContent;
+    let ok = false;
+
+    try {
+      await navigator.clipboard.writeText(text);
+      ok = true;
+    } catch { /* fall through */ }
+
+    if (!ok) {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0';
+      document.body.appendChild(ta);
+      ta.select();
+      try { ok = document.execCommand('copy'); } catch { ok = false; }
+      ta.remove();
+    }
+
+    if (!ok) {
+      const range = document.createRange();
+      range.selectNodeContents(node);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+    }
+
+    btn.textContent = ok ? '✓ Copied' : 'Selected — press Ctrl+C';
+    btn.classList.add('done');
+    setTimeout(() => { btn.textContent = label; btn.classList.remove('done'); }, 2200);
+  });
+});
 </script>
 </body>
 </html>
