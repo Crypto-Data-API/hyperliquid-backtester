@@ -617,7 +617,10 @@ _INDEX_TEMPLATE = r"""<!doctype html>
      horizontal strip rather than a tall column of icons against empty space. */
   .panel.shut .rail{flex-direction:row;width:100%;padding:6px 10px;
     border-right:none;justify-content:flex-start;gap:6px}
-  .panel.shut .rail .spacer{flex:1}
+  /* collapsed: the expand control leads, so it reads as "open this"
+     rather than trailing the tabs it belongs to */
+  .panel.shut .rail .spacer{display:none}
+  .panel.shut .rail .collapse{order:-1}
   .rail button{width:36px;height:36px;display:flex;align-items:center;justify-content:center;
     border-radius:8px;cursor:pointer;border:none;background:transparent;color:#8ea19c;
     transition:all .12s;padding:0}
