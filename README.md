@@ -9,7 +9,9 @@ Here is the kind of thing it tells you that a normal backtest hides. The mean-re
 
 That is the entire design goal: a number you can act on, or a number you can throw away — but never a number that flatters you.
 
-![The Hyperliquid Backtester replay — candles, equity curve, and bar-by-bar playback](attachments/hyperliquid-backtester-app.png)
+[![The Hyperliquid Backtester replay — entries and exits firing bar by bar against a live equity curve](attachments/hyperliquid-backtester-demo.gif)](attachments/hyperliquid-backtester-demo.mp4)
+
+<sub>Replaying `sma_cross` on BTC 15m — click for full resolution. Blue arrows are longs, yellow are shorts; green dots closed in profit, red at a loss.</sub>
 
 ## Three things it does that most backtesters don't
 
