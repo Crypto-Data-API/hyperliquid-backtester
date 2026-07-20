@@ -110,9 +110,22 @@ def cmd_run(args) -> int:
 
 def cmd_demo(args) -> int:
     """Write the self-contained replay chart next to a result JSON."""
-    from .demo import export
+    from .demo import build_index, export
     out = export(Path(args.result), Path(args.out) if args.out else None)
+    index = build_index(out.parent)          # keep the run list current
     print(f"wrote {out}\n  open it in a browser and press Play")
+    print(f"wrote {index}")
+    return 0
+
+
+def cmd_index(args) -> int:
+    """Rebuild the run index for a results directory."""
+    from .demo import build_index
+    directory = Path(args.dir)
+    if not directory.is_dir():
+        raise SystemExit(f"not a directory: {directory}")
+    out = build_index(directory)
+    print(f"wrote {out}")
     return 0
 
 
@@ -150,6 +163,10 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("result", help="path to a --json-out file")
     p.add_argument("--out", help="output .html (default: alongside the result)")
     p.set_defaults(func=cmd_demo)
+
+    p = sub.add_parser("index", help="rebuild the run index page")
+    p.add_argument("dir", nargs="?", default="results", help="results directory")
+    p.set_defaults(func=cmd_index)
 
     args = parser.parse_args(argv)
     logging.basicConfig(

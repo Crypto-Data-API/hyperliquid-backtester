@@ -13,6 +13,9 @@ hlbt run  --strategy strategies/examples/bollinger_revert.py --symbol BTC --json
 hlbt demo results/btc.json          # → results/btc.html, press Play
 ```
 
+Then open `results/index.html` — every run you have exported, sorted by return,
+each one a click away from its replay.
+
 ---
 
 ## Why this exists
@@ -34,6 +37,9 @@ Most backtests lie in the same three ways, so this engine is opinionated about a
 A summary table tells you a strategy made 1.7% with a 67% win rate. The replay tells you it spent five weeks underwater first. Those are very different things to know before you risk money, and only one of them is visible in a table.
 
 Controls: **Space** play/pause · **←/→** step one bar · scrub bar · 1× to 64× · jump to end.
+
+The chart fills the window, and the logo goes back to the run index. `hlbt demo`
+refreshes that index automatically; `hlbt index results` rebuilds it on demand.
 
 ---
 
