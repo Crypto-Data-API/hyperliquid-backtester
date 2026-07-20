@@ -191,6 +191,33 @@ def test_no_trades_is_reported_not_raised():
     assert "note" in s
 
 
+def test_trade_pnl_reconciles_with_the_equity_curve():
+    """The invariant that catches a flattering trade record.
+
+    Every trade's ``net_pnl`` must account for both fee legs, so that summing
+    them lands exactly on the change in equity. Charging the entry fee to
+    equity but omitting it from the record inflates expectancy by one leg of
+    fees on every trade — invisible in the return, obvious here.
+    """
+    bars = make_bars(600)
+    cfg = BacktestConfig(taker_fee=0.001, slippage=0.0005)
+    result = Backtester(cfg).run(AlwaysLong(), bars, "TEST", "15m")
+    assert len(result.trades) > 5
+
+    summed = sum(t.net_pnl for t in result.trades)
+    actual = result.equity_curve[-1]["equity"] - cfg.initial_capital
+    # Trade fields are rounded to 6dp for readable JSON, so summing hundreds of
+    # them drifts by a fraction of a cent. Anything larger is an accounting bug,
+    # not rounding.
+    assert summed == pytest.approx(actual, abs=0.01)
+
+    # and fees must be the full round trip, not one side of it
+    for t in result.trades:
+        assert t.fees == pytest.approx(t.notional * cfg.taker_fee * 2, rel=1e-6)
+        # each field is rounded independently, so allow a few ulps of 1e-6
+        assert t.net_pnl == pytest.approx(t.gross_pnl - t.fees + t.funding_pnl, abs=1e-5)
+
+
 def test_equity_curve_has_one_point_per_bar():
     bars = make_bars(300)
     result = Backtester().run(AlwaysLong(), bars, "TEST", "15m")

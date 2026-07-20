@@ -25,7 +25,7 @@ from hlbt.strategy import Context, Position, Signal, Strategy
 
 
 class BollingerRevert(Strategy):
-    name = "bollinger_revert"
+    name = "bollinger_revert (example)"
     warmup = 100
 
     # -- entry -------------------------------------------------------------

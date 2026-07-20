@@ -20,7 +20,7 @@ from hlbt.strategy import Context, Position, Signal, Strategy
 
 
 class SmaCross(Strategy):
-    name = "sma_cross"
+    name = "sma_cross (example)"
     warmup = 60
 
     fast_length = 12

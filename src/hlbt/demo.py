@@ -613,6 +613,11 @@ _INDEX_TEMPLATE = r"""<!doctype html>
     background:linear-gradient(180deg,#0a1210,#070b0a);display:flex;max-height:52vh}
   .rail{flex:none;width:52px;display:flex;flex-direction:column;align-items:center;gap:4px;
     padding:10px 0;border-right:1px solid rgba(120,140,135,.14)}
+  /* Collapsed, there is no content beside the rail — so it becomes a single
+     horizontal strip rather than a tall column of icons against empty space. */
+  .panel.shut .rail{flex-direction:row;width:100%;padding:6px 10px;
+    border-right:none;justify-content:flex-start;gap:6px}
+  .panel.shut .rail .spacer{flex:1}
   .rail button{width:36px;height:36px;display:flex;align-items:center;justify-content:center;
     border-radius:8px;cursor:pointer;border:none;background:transparent;color:#8ea19c;
     transition:all .12s;padding:0}
@@ -753,7 +758,6 @@ const S = {
   sortDir: Number(store.get('sortDir', -1)),
   tab: store.get('tab', 'prompts'),
   open: store.get('panelOpen', '1') === '1',
-  sparklines: store.get('sparklines', '1') === '1',
   highlight: store.get('highlight', '1') === '1',
 };
 
@@ -774,7 +778,7 @@ const COLS = [
 ];
 
 function spark(curve, positive) {
-  if (!S.sparklines || !curve || curve.length < 2) return '';
+  if (!curve || curve.length < 2) return '';
   const w = 94, h = 30, pad = 3;
   const min = Math.min(...curve, 0), max = Math.max(...curve, 0);
   const range = (max - min) || 1;
@@ -972,7 +976,6 @@ const LINK_GROUPS = [
 ];
 
 const SETTINGS = [
-  {key: 'sparklines', label: 'Show equity sparklines', desc: 'Mini P&L curve per run in the table.'},
   {key: 'highlight', label: 'Highlight profitable runs', desc: 'Accent bar + tint on positive-return rows.'},
   {key: 'winnersOnly', label: 'Profitable only', desc: 'Hide runs with a negative return.'},
 ];
@@ -1049,6 +1052,7 @@ function copyPrompt(btn) {
 /* ---------------- panel chrome ---------------- */
 function setPanel(open, persist) {
   S.open = open;
+  $('panel').classList.toggle('shut', !open);
   $('panebody').hidden = !open;
   $('collapse').innerHTML = open ? ICON.down : ICON.up;
   $('collapse').title = open ? 'Collapse panel' : 'Expand panel';

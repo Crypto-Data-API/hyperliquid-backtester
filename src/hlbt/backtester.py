@@ -200,12 +200,22 @@ class Backtester:
                 "drawdown": round((mark - peak) / peak * 100.0 if peak else 0.0, 6),
             })
 
-        # close anything still open on the final bar, so equity is realised
+        # Close anything still open on the final bar, so equity is realised.
+        # The last curve point was written inside the loop while the position
+        # was still open, so it holds a mark-to-market value — rewrite it with
+        # the realised number, or the curve ends somewhere the account never
+        # actually was.
         if position is not None:
             equity = self._close(
                 position, float(c[-1]), n - 1, int(t[-1]), equity, trades, symbol,
                 "end_of_data",
             )
+            if curve:
+                peak = max(peak, equity)
+                curve[-1]["equity"] = round(equity, 6)
+                curve[-1]["drawdown"] = round(
+                    (equity - peak) / peak * 100.0 if peak else 0.0, 6
+                )
 
         return BacktestResult(
             strategy=strategy.name, symbol=symbol, timeframe=timeframe,
@@ -268,11 +278,24 @@ class Backtester:
             move = -move
         gross = move * p.notional
         exit_fee = p.notional * self.config.taker_fee
-        fees = self._entry_fee(p) + exit_fee
-        net = gross - exit_fee + p.funding_paid
+        entry_fee = self._entry_fee(p)
+        fees = entry_fee + exit_fee
         margin = self._margin(p)
 
-        equity += net
+        # Equity and the trade record settle different subsets, and conflating
+        # them corrupts both.
+        #
+        # Already applied to equity before we get here:
+        #   - the entry fee, charged at _open
+        #   - funding, credited or debited bar by bar while the position was held
+        # So only the gross move and the exit fee settle now. Adding funding
+        # again here double-counts it; adding the entry fee again double-charges.
+        #
+        # The trade record is the opposite: it must carry the *whole* round trip
+        # — both fee legs and all funding — or expectancy silently overstates
+        # profit on every trade.
+        equity += gross - exit_fee
+        net = gross - fees + p.funding_paid
         trades.append(Trade(
             symbol=symbol, side=p.side, entry_time=p.entry_time, exit_time=time,
             entry_index=p.entry_index, exit_index=index,
