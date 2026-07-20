@@ -547,10 +547,10 @@ _INDEX_TEMPLATE = r"""<!doctype html>
   @keyframes hbPanel{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 
   /* ---- header ---- */
-  header{flex:none;display:flex;align-items:center;gap:20px;padding:0 24px;height:56px;
+  header{flex:none;display:flex;align-items:center;gap:20px;padding:0 24px;height:70px;
     border-bottom:1px solid rgba(120,140,135,.14);background:linear-gradient(180deg,#0a1210,#080c0b)}
-  .brand{display:flex;align-items:center;gap:11px;text-decoration:none}
-  .brand .wm{font-weight:800;letter-spacing:1.5px;font-size:14px;color:#f2f7f5}
+  .brand{display:flex;align-items:center;gap:13px;text-decoration:none}
+  .brand .wm{font-weight:800;letter-spacing:1.8px;font-size:19px;color:#f2f7f5}
   .brand .wm span{color:var(--accent)}
   .pill{font-size:11px;letter-spacing:.5px;color:#7d908b;padding:3px 9px;
     border:1px solid rgba(120,140,135,.2);border-radius:999px}
@@ -667,7 +667,7 @@ _INDEX_TEMPLATE = r"""<!doctype html>
 
 <header>
   <a class="brand" href="index.html" title="All runs">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" style="display:block">
+    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" style="display:block">
       <rect x="2" y="10" width="9" height="12" rx="1.5" fill="var(--accent)"></rect>
       <rect x="13" y="2" width="9" height="20" rx="1.5" fill="var(--accent)" opacity="0.55"></rect>
     </svg>
