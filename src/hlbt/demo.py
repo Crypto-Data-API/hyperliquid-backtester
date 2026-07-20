@@ -543,19 +543,20 @@ _INDEX_TEMPLATE = r"""<!doctype html>
   /* --- collapsible panel -------------------------------------------- */
   .panel{border:1px solid var(--line);border-radius:12px;background:#0a120f;
     overflow:hidden}
-  .panelbar{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;
-    padding:13px 16px}
-  .panelbar h2.section{margin:0}
-  .panelsub{flex:1;min-width:180px;font-size:12px;color:var(--dim)}
+  .panelbar{display:flex;align-items:center;gap:11px;flex-wrap:wrap;
+    padding:7px 13px;min-height:0}
+  .panelbar h2.section{margin:0;font-size:13.5px;line-height:1.3}
+  .panelsub{flex:1;min-width:180px;font-size:11.5px;color:var(--dim);
+    line-height:1.3}
   .mini{background:transparent;color:var(--dim);border:1px solid var(--line);
-    border-radius:7px;padding:6px 13px;font:600 11.5px/1 inherit;cursor:pointer;
+    border-radius:6px;padding:4px 11px;font:600 11px/1.3 inherit;cursor:pointer;
     white-space:nowrap}
   .mini:hover{color:var(--accent);border-color:var(--accent)}
-  .mini::before{content:"▾ ";font-size:10px}
+  .mini::before{content:"▾ ";font-size:9px}
   .panel.collapsed .mini::before{content:"▸ "}
-  .panelbody{padding:0 16px 16px;border-top:1px solid var(--line);
-    margin-top:2px;padding-top:4px}
+  .panelbody{padding:2px 13px 14px;border-top:1px solid var(--line)}
   .panelbody[hidden]{display:none}
+  .panelbody .cards{margin-top:12px}
   .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(310px,1fr));
     gap:14px;margin-top:14px}
   .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;
