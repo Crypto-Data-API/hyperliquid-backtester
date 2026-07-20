@@ -1,9 +1,6 @@
 # Hyperliquid Backtester
 
-> ### Most backtests lie to you.
-> **This one charges the fees, pays the funding, refuses to peek at the future — then replays every trade bar by bar so you can watch exactly where the money went.**
-
-Backtest crypto perpetual strategies against real Hyperliquid market data, on your machine, in three commands.
+> *Backtest crypto perpetual strategies against real Hyperliquid market data, on your machine, in three commands.*
 
 Here is the kind of thing it tells you that a normal backtest hides. The mean-reversion example in this repo returns **+1.72%** over 71 days — and to earn that **$172 of profit it paid $605 in fees.** Costs ate **78% of the gross**. Switch fees off, as most backtests quietly do, and the same strategy looks like a runaway winner.
 
@@ -77,8 +74,11 @@ for the replay. Press **Play**.
 
 ## The replay
 
-**Space** play/pause · **←/→** step one bar · scrub · 1× to 64× · jump to end. Entries are
-blue for long and yellow for short; exits are green for a win and red for a loss.
+**Space** play/pause · **←/→** step one bar · scrub · **0.25× to 64×** · jump to end. Entries
+are blue for long and yellow for short; exits are green for a win and red for a loss.
+
+It opens at 0.5× — slow enough to watch a position open, sit, and resolve. Wind it up to
+16× or 64× to skim a long run, or jump straight to the finished result.
 
 The run index sorts on any column, filters by strategy, and draws an equity sparkline per
 run — so a losing streak is visible before you open anything.

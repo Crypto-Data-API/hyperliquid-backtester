@@ -222,8 +222,10 @@ _TEMPLATE = r"""<!doctype html>
     <button id="reset" class="ghost">Reset</button>
     <input type="range" id="scrub" min="0" max="100" value="0">
     <select id="speed">
+      <option value="0.25">0.25×</option>
+      <option value="0.5" selected>0.5×</option>
       <option value="1">1×</option>
-      <option value="4" selected>4×</option>
+      <option value="4">4×</option>
       <option value="16">16×</option>
       <option value="64">64×</option>
       <option value="0">Jump to end</option>
@@ -427,7 +429,9 @@ function step() {
 // Bars per second for each speed setting. Driven by requestAnimationFrame with
 // delta-time accumulation, so playback runs at the same rate on a 60Hz and a
 // 144Hz display — and pauses cleanly when the tab is backgrounded.
-const BARS_PER_SEC = {1: 30, 4: 120, 16: 480, 64: 1920};
+// The slow end matters more than the fast: at 0.25x you can actually watch an
+// entry fire and the position resolve, which is the point of a replay.
+const BARS_PER_SEC = {0.25: 7.5, 0.5: 15, 1: 30, 4: 120, 16: 480, 64: 1920};
 
 function play() {
   const speed = Number(el('speed').value);
@@ -435,7 +439,7 @@ function play() {
   playing = true;
   el('play').textContent = '❚❚ Pause';
 
-  const rate = BARS_PER_SEC[speed] || 120;
+  const rate = BARS_PER_SEC[speed] || 15;
   let last = performance.now();
   let carry = 0;
 
