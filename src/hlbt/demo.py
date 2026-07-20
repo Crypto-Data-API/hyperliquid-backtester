@@ -208,10 +208,15 @@ _TEMPLATE = r"""<!doctype html>
 
 <footer>
   <div class="note">
+    <strong>Overfitting is real.</strong> The more variants you test, the more
+    likely the best-looking one is noise rather than edge — the winner of a
+    hundred attempts looks good <em>by construction</em>. Count your trials, keep
+    a holdout you have not looked at, and treat a result that only works at one
+    exact parameter value as noise.
     Market data: <a href="https://cryptodataapi.com/backtest-data">CryptoDataAPI</a>
     backtesting archive — Hyperliquid klines and funding.
-    Backtest results are historical simulations, not predictions, and exclude
-    order-book depth. Nothing here is financial advice.
+    Results are historical simulations, not predictions, and exclude order-book
+    depth, partial fills and market impact. Nothing here is financial advice.
   </div>
 </footer>
 
@@ -545,10 +550,15 @@ _INDEX_TEMPLATE = r"""<!doctype html>
 </main>
 
 <footer>
+  <strong>Overfitting is real.</strong> The more variants you test, the more likely
+  the best-looking one is noise rather than edge — the winner of a hundred attempts
+  looks good <em>by construction</em>. Count your trials, keep a holdout you have not
+  looked at, and be suspicious of a result that only works at one exact parameter
+  value. Win rate alone is not evidence of an edge either: read profit factor and
+  max drawdown beside it.
   Market data: <a href="https://cryptodataapi.com/backtest-data">CryptoDataAPI</a>
   backtesting archive — Hyperliquid klines and funding.
-  Win rate alone is not evidence of an edge: read profit factor and max drawdown
-  beside it. Historical simulations, not predictions. Nothing here is financial advice.
+  Historical simulations, not predictions. Nothing here is financial advice.
 </footer>
 
 <script>
