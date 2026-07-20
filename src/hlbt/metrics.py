@@ -25,7 +25,8 @@ def summarise(result) -> dict:
     if not trades:
         return {
             "total_trades": 0, "win_rate": 0.0, "profit_factor": 0.0,
-            "expectancy": 0.0, "total_return_pct": 0.0, "sharpe": 0.0,
+            "risk_reward": 0.0, "expectancy": 0.0,
+            "total_return_pct": 0.0, "sharpe": 0.0,
             "max_drawdown_pct": 0.0, "final_equity": round(final, 2),
             "total_fees": 0.0, "total_funding": 0.0, "liquidations": 0,
             "note": "No trades. Check warmup, entry thresholds, and data window.",
@@ -52,15 +53,24 @@ def summarise(result) -> dict:
 
     max_dd = min((p["drawdown"] for p in curve), default=0.0)
 
+    # Risk:reward — average win against average loss. Distinct from profit
+    # factor, which folds in how *often* each happens. A strategy can have a
+    # poor R:R and still be profitable if it wins often enough, and vice versa,
+    # so the pair is only meaningful read together with win rate.
+    avg_win = gross_win / len(wins) if wins else 0.0
+    avg_loss = gross_loss / len(losses) if losses else 0.0   # positive magnitude
+    risk_reward = avg_win / avg_loss if avg_loss else 0.0
+
     return {
         "total_trades": len(trades),
         "wins": len(wins),
         "losses": len(losses),
         "win_rate": round(len(wins) / len(trades) * 100.0, 2),
         "profit_factor": round(gross_win / gross_loss, 4) if gross_loss else float("inf"),
+        "risk_reward": round(risk_reward, 2),
         "expectancy": round(sum(pnls) / len(pnls), 4),
-        "avg_win": round(gross_win / len(wins), 4) if wins else 0.0,
-        "avg_loss": round(-gross_loss / len(losses), 4) if losses else 0.0,
+        "avg_win": round(avg_win, 4),
+        "avg_loss": round(-avg_loss, 4),
         "total_return_pct": round((final - initial) / initial * 100.0, 4) if initial else 0.0,
         "sharpe": round(sharpe, 4),
         "max_drawdown_pct": round(max_dd, 4),

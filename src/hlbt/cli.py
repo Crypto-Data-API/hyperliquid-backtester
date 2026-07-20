@@ -91,6 +91,7 @@ def cmd_run(args) -> int:
         ("Trades", "total_trades", ""),
         ("Win rate", "win_rate", "%"),
         ("Profit factor", "profit_factor", ""),
+        ("Risk:reward", "risk_reward", " (avg win / avg loss)"),
         ("Expectancy", "expectancy", " per trade"),
         ("Total return", "total_return_pct", "%"),
         ("Sharpe", "sharpe", ""),

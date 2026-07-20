@@ -88,6 +88,8 @@ def build_index(results_dir: Path) -> Path:
             "trades": s.get("total_trades", 0),
             "win_rate": s.get("win_rate", 0.0),
             "profit_factor": s.get("profit_factor", 0.0),
+            "risk_reward": s.get("risk_reward", 0.0),
+            "expectancy": s.get("expectancy", 0.0),
             "return_pct": s.get("total_return_pct", 0.0),
             "max_dd": s.get("max_drawdown_pct", 0.0),
             "fees": s.get("total_fees", 0.0),
@@ -193,6 +195,7 @@ _TEMPLATE = r"""<!doctype html>
 
   <div class="controls">
     <button id="play">▶ Play</button>
+    <button id="result" class="ghost">Show result</button>
     <button id="reset" class="ghost">Reset</button>
     <input type="range" id="scrub" min="0" max="100" value="0">
     <select id="speed">
@@ -438,6 +441,8 @@ el('play').onclick = () => {
   if (cursor >= N - 1) seek(0);
   play();
 };
+// skip the replay and jump straight to the finished backtest
+el('result').onclick = () => { pause(); seek(N - 1); };
 el('reset').onclick = () => { pause(); seek(0); };
 el('scrub').oninput = e => {
   pause();
@@ -521,8 +526,11 @@ _INDEX_TEMPLATE = r"""<!doctype html>
     font:13px/1.4 ui-monospace,monospace;white-space:nowrap}
   th{font:600 10.5px/1.4 ui-sans-serif,system-ui;color:var(--dim);
     text-transform:uppercase;letter-spacing:.06em;background:#0a120f}
-  th:first-child,td:first-child{text-align:left}
-  th:nth-child(2),td:nth-child(2){text-align:left}
+  /* strategy, perps and timeframe read as labels, so left-align them;
+     every numeric column stays right-aligned for column-wise comparison */
+  th:first-child,td:first-child,
+  th:nth-child(2),td:nth-child(2),
+  th:nth-child(3),td:nth-child(3){text-align:left}
   tbody tr:last-child td{border-bottom:0}
   tbody tr:hover{background:rgba(52,226,155,.05)}
   td a{color:var(--text);text-decoration:none;font-weight:700}
@@ -782,17 +790,21 @@ if (!ROWS.length) {
   ROWS.sort((a, b) => b.return_pct - a.return_pct);
   host.innerHTML = `<div class="wrap"><table>
     <thead><tr>
-      <th>Strategy</th><th>Market</th><th>Trades</th><th>Win rate</th>
-      <th>Profit factor</th><th>Return</th><th>Max drawdown</th><th>Sharpe</th>
-      <th>Fees</th><th></th>
+      <th>Strategy</th><th>Perps</th><th>Timeframe</th><th>Trades</th>
+      <th>Win rate</th><th>Profit factor</th><th title="Average win divided by average loss">R:R</th>
+      <th title="Average net profit or loss per trade">Expectancy $</th>
+      <th>Return</th><th>Max drawdown</th><th>Sharpe</th><th>Fees</th><th></th>
     </tr></thead>
     <tbody>${ROWS.map(r => `
       <tr>
         <td>${r.href ? `<a href="${r.href}">${r.strategy}</a>` : `<span class="muted">${r.strategy}</span>`}</td>
-        <td class="muted">${r.symbol} · ${r.timeframe}</td>
+        <td>${r.symbol}</td>
+        <td class="muted">${r.timeframe}</td>
         <td>${r.trades}</td>
         <td>${fmt(r.win_rate, 1)}%</td>
         <td>${fmt(r.profit_factor)}</td>
+        <td>${fmt(r.risk_reward)}</td>
+        <td class="${cls(r.expectancy)}">${r.expectancy >= 0 ? '+' : '−'}$${fmt(Math.abs(r.expectancy))}</td>
         <td class="${cls(r.return_pct)}">${r.return_pct >= 0 ? '+' : ''}${fmt(r.return_pct)}%</td>
         <td class="down">${fmt(r.max_dd)}%</td>
         <td>${fmt(r.sharpe)}</td>
