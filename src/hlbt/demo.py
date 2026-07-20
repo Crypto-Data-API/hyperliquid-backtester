@@ -689,7 +689,7 @@ Be blunt with me rather than encouraging.
 Exchange sign-up with fee discounts:
   Hyperliquid (4% off spot & perp fees):
     https://app.hyperliquid.xyz/join/CRYPTODATAAPI
-  Binance (up to 20% off trading fees):
+  Binance (10% off trading fees):
     https://www.binance.com/register?ref=RZSKG1XM
 
 Live market data for the agent: https://cryptodataapi.com/mcp
@@ -718,7 +718,7 @@ Do not tell me whether to take a trade. I want the mechanics and the risks.</pre
       <b>Hyperliquid</b> <span>4% off fees · referral</span></a>
     <a class="btn" style="--c:#f5a524" target="_blank" rel="noopener"
        href="https://www.binance.com/register?ref=RZSKG1XM">
-      <b>Binance</b> <span>up to 20% off fees · referral</span></a>
+      <b>Binance</b> <span>10% off fees · referral</span></a>
     <a class="btn" style="--c:#7d968e" target="_blank" rel="noopener"
        href="https://github.com/Crypto-Data-API/hyperliquid-backtester">
       <b>Source</b> <span>GitHub · MIT</span></a>
