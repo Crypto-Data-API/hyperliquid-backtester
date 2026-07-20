@@ -74,10 +74,10 @@ for the replay. Press **Play**.
 
 ## The replay
 
-**Space** play/pause · **←/→** step one bar · scrub · **0.25× to 64×** · jump to end. Entries
+**Space** play/pause · **←/→** step one bar · scrub · **0.1× to 64×** · jump to end. Entries
 are blue for long and yellow for short; exits are green for a win and red for a loss.
 
-It opens at 0.5× — slow enough to watch a position open, sit, and resolve. Wind it up to
+It opens at 0.25× — slow enough to watch a position open, sit, and resolve. Wind it up to
 16× or 64× to skim a long run, or jump straight to the finished result.
 
 The run index sorts on any column, filters by strategy, and draws an equity sparkline per
